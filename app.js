@@ -39,7 +39,6 @@ function hashCode(str) {
 }
 
 function generatePrice(code) {
-  // 用条码内容的哈希值生成确定性价格（0.5 ~ 99.9元）
   const hash = hashCode(code);
   const price = (hash % 994 + 5) / 10; // 0.5 ~ 99.9
   return price;
@@ -52,8 +51,6 @@ function formatPrice(price) {
 // ========== 语音播报 ==========
 function speakPrice(price) {
   if (!('speechSynthesis' in window)) return;
-
-  // 取消之前的播报
   speechSynthesis.cancel();
 
   const yuan = Math.floor(price);
@@ -75,10 +72,17 @@ function speakPrice(price) {
   speechSynthesis.speak(utterance);
 }
 
+// ========== 购物车状态 ==========
+let itemCount = 0;
+let totalPrice = 0;
+
 // ========== UI 更新 ==========
 const priceValueEl = document.getElementById('price-value');
-const statusEl = document.getElementById('status');
 const scannerContainer = document.getElementById('scanner-container');
+const itemCountEl = document.getElementById('item-count');
+const totalValueEl = document.getElementById('total-value');
+const receiptListEl = document.getElementById('receipt-list');
+const receiptEl = document.getElementById('receipt');
 
 function showPrice(price) {
   priceValueEl.textContent = formatPrice(price);
@@ -91,8 +95,20 @@ function showPrice(price) {
   }, 300);
 }
 
-function setStatus(text) {
-  statusEl.textContent = text;
+function addToReceipt(price) {
+  itemCount++;
+  totalPrice += price;
+
+  itemCountEl.textContent = itemCount;
+  totalValueEl.textContent = formatPrice(totalPrice);
+
+  const item = document.createElement('div');
+  item.className = 'receipt-item';
+  item.innerHTML =
+    '<span class="item-no">#' + itemCount + '</span>' +
+    '<span class="item-price">¥' + formatPrice(price) + '</span>';
+  receiptListEl.appendChild(item);
+  receiptEl.scrollTop = receiptEl.scrollHeight;
 }
 
 // ========== 扫描逻辑 ==========
@@ -102,75 +118,60 @@ let lastScanTime = 0;
 
 function onScanSuccess(decodedText) {
   const now = Date.now();
-
-  // 防抖：同一个码 3 秒内不重复触发
-  if (decodedText === lastScannedCode && now - lastScanTime < 3000) {
-    return;
-  }
-
+  if (decodedText === lastScannedCode && now - lastScanTime < 3000) return;
   if (isProcessing) return;
+
   isProcessing = true;
   lastScannedCode = decodedText;
   lastScanTime = now;
 
-  // 1. 播放嘀声
   playBeep();
 
-  // 2. 根据条码内容生成固定价格
   const price = generatePrice(decodedText);
-
-  // 3. 显示价格
   showPrice(price);
-  setStatus('已扫描');
+  addToReceipt(price);
 
-  // 4. 语音播报
   setTimeout(() => speakPrice(price), 200);
 
-  // 5. 2秒后恢复
   setTimeout(() => {
     isProcessing = false;
-    setStatus('准备扫描...');
   }, 2000);
 }
 
 // ========== 初始化扫描器 ==========
 function initScanner() {
-  const formatsToSupport = [
-    Html5QrcodeSupportedFormats.QR_CODE,
-    Html5QrcodeSupportedFormats.EAN_13,
-    Html5QrcodeSupportedFormats.EAN_8,
-    Html5QrcodeSupportedFormats.CODE_128,
-    Html5QrcodeSupportedFormats.CODE_39,
-    Html5QrcodeSupportedFormats.UPC_A,
-    Html5QrcodeSupportedFormats.UPC_E,
-    Html5QrcodeSupportedFormats.ITF,
-  ];
-
   const html5QrCode = new Html5Qrcode('reader', {
-    formatsToSupport: formatsToSupport,
+    formatsToSupport: [
+      Html5QrcodeSupportedFormats.QR_CODE,
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.CODE_128,
+      Html5QrcodeSupportedFormats.CODE_39,
+      Html5QrcodeSupportedFormats.UPC_A,
+      Html5QrcodeSupportedFormats.UPC_E,
+      Html5QrcodeSupportedFormats.ITF,
+    ],
     verbose: false,
   });
 
-  const scannerContainer = document.getElementById('scanner-container');
-  const width = scannerContainer.clientWidth;
-  const height = scannerContainer.clientHeight;
+  const container = document.getElementById('scanner-container');
+  const w = container.clientWidth;
+  const h = container.clientHeight;
 
   html5QrCode.start(
     { facingMode: 'environment' },
     {
       fps: 10,
-      qrbox: { width: Math.floor(width * 0.8), height: Math.floor(height * 0.6) },
+      qrbox: { width: Math.floor(w * 0.75), height: Math.floor(h * 0.55) },
     },
     onScanSuccess,
-    () => {} // 忽略扫描失败
+    () => {}
   ).then(() => {
-    setStatus('准备扫描...');
+    // ok
   }).catch((err) => {
-    setStatus('摄像头错误: ' + err);
     console.error('Camera error:', err);
-    // 显示开始按钮以便重试
     const startBtn = document.getElementById('start-btn');
-    startBtn.textContent = '重试';
+    startBtn.textContent = '摄像头失败，点击重试';
     startBtn.style.display = '';
     document.getElementById('scan-line').style.display = 'none';
   });
@@ -181,15 +182,13 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
-// ========== 启动：点击按钮后请求摄像头权限 ==========
+// ========== 启动 ==========
 window.addEventListener('DOMContentLoaded', () => {
   const startBtn = document.getElementById('start-btn');
   startBtn.addEventListener('click', () => {
-    try {
-      ensureAudioCtx();
-    } catch (e) { /* ignore audio errors */ }
+    try { ensureAudioCtx(); } catch (e) { /* ignore */ }
     if (typeof Html5Qrcode === 'undefined') {
-      setStatus('扫码库加载失败，请联网后刷新重试');
+      startBtn.textContent = '加载失败，请联网刷新';
       return;
     }
     startBtn.textContent = '正在启动...';

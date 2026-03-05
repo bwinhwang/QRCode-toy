@@ -1,4 +1,4 @@
-const CACHE_NAME = 'scan-toy-v4';
+const CACHE_NAME = 'scan-toy-v5';
 const ASSETS = [
   './',
   './index.html',
