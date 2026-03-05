@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="screen-orientation" content="landscape">
+  <title>超市扫码器</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 扫描区域 -->
+    <div id="scanner-container">
+      <div id="reader"></div>
+      <div id="scan-line"></div>
+    </div>
+
+    <!-- 价格显示区域（仿LED屏） -->
+    <div id="price-display">
+      <div id="price-label">价格</div>
+      <div id="price-value">0.00</div>
+      <div id="price-unit">元</div>
+    </div>
+
+    <!-- 状态提示 -->
+    <div id="status">准备扫描...</div>
+  </div>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

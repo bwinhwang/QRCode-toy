@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#1a1a2e"/>
+  <!-- 条形码图案 -->
+  <g fill="#00ff41">
+    <rect x="96" y="100" width="16" height="220"/>
+    <rect x="128" y="100" width="8" height="220"/>
+    <rect x="148" y="100" width="22" height="220"/>
+    <rect x="186" y="100" width="12" height="220"/>
+    <rect x="214" y="100" width="16" height="220"/>
+    <rect x="246" y="100" width="8" height="220"/>
+    <rect x="268" y="100" width="26" height="220"/>
+    <rect x="310" y="100" width="10" height="220"/>
+    <rect x="336" y="100" width="16" height="220"/>
+    <rect x="368" y="100" width="8" height="220"/>
+    <rect x="390" y="100" width="22" height="220"/>
+  </g>
+  <!-- 扫描线 -->
+  <rect x="80" y="205" width="352" height="6" fill="#ff3333" opacity="0.9"/>
+  <!-- 价格文字 -->
+  <text x="256" y="410" text-anchor="middle" font-family="monospace" font-size="72" font-weight="bold" fill="#00ff41">¥9.90</text>
+</svg>
