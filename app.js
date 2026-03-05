@@ -185,10 +185,16 @@ if ('serviceWorker' in navigator) {
 window.addEventListener('DOMContentLoaded', () => {
   const startBtn = document.getElementById('start-btn');
   startBtn.addEventListener('click', () => {
-    ensureAudioCtx();
+    try {
+      ensureAudioCtx();
+    } catch (e) { /* ignore audio errors */ }
+    if (typeof Html5Qrcode === 'undefined') {
+      setStatus('扫码库加载失败，请联网后刷新重试');
+      return;
+    }
     startBtn.textContent = '正在启动...';
-    initScanner();
     startBtn.style.display = 'none';
     document.getElementById('scan-line').style.display = '';
+    initScanner();
   });
 });
