@@ -168,15 +168,19 @@ function initScanner() {
   });
 }
 
-// ========== 页面点击激活音频上下文（iOS要求） ==========
-document.addEventListener('click', () => {
-  ensureAudioCtx();
-}, { once: true });
-
 // ========== 注册 Service Worker ==========
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
-// ========== 启动 ==========
-window.addEventListener('DOMContentLoaded', initScanner);
+// ========== 启动：点击按钮后请求摄像头权限 ==========
+window.addEventListener('DOMContentLoaded', () => {
+  const startBtn = document.getElementById('start-btn');
+  startBtn.addEventListener('click', () => {
+    ensureAudioCtx();
+    startBtn.textContent = '正在启动...';
+    initScanner();
+    startBtn.style.display = 'none';
+    document.getElementById('scan-line').style.display = '';
+  });
+});

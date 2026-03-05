@@ -57,6 +57,29 @@ body {
   display: none !important;
 }
 
+/* 开始按钮 */
+#start-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  color: #00ff41;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid #00ff41;
+  border-radius: 16px;
+  padding: 24px 48px;
+  cursor: pointer;
+  z-index: 20;
+  text-align: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#start-btn:active {
+  background: rgba(0, 255, 65, 0.2);
+}
+
 /* 扫描线动画 */
 #scan-line {
   position: absolute;
