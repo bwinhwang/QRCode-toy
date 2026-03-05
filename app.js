@@ -135,36 +135,44 @@ function onScanSuccess(decodedText) {
 
 // ========== 初始化扫描器 ==========
 function initScanner() {
-  const html5QrCode = new Html5Qrcode('reader');
+  const formatsToSupport = [
+    Html5QrcodeSupportedFormats.QR_CODE,
+    Html5QrcodeSupportedFormats.EAN_13,
+    Html5QrcodeSupportedFormats.EAN_8,
+    Html5QrcodeSupportedFormats.CODE_128,
+    Html5QrcodeSupportedFormats.CODE_39,
+    Html5QrcodeSupportedFormats.UPC_A,
+    Html5QrcodeSupportedFormats.UPC_E,
+    Html5QrcodeSupportedFormats.ITF,
+  ];
 
-  const config = {
-    fps: 10,
-    qrbox: undefined, // 全区域扫描
-    formatsToSupport: [
-      Html5QrcodeSupportedFormats.QR_CODE,
-      Html5QrcodeSupportedFormats.EAN_13,
-      Html5QrcodeSupportedFormats.EAN_8,
-      Html5QrcodeSupportedFormats.CODE_128,
-      Html5QrcodeSupportedFormats.CODE_39,
-      Html5QrcodeSupportedFormats.UPC_A,
-      Html5QrcodeSupportedFormats.UPC_E,
-      Html5QrcodeSupportedFormats.ITF,
-    ],
-  };
+  const html5QrCode = new Html5Qrcode('reader', {
+    formatsToSupport: formatsToSupport,
+    verbose: false,
+  });
+
+  const scannerContainer = document.getElementById('scanner-container');
+  const width = scannerContainer.clientWidth;
+  const height = scannerContainer.clientHeight;
 
   html5QrCode.start(
     { facingMode: 'environment' },
-    config,
+    {
+      fps: 10,
+      qrbox: { width: Math.floor(width * 0.8), height: Math.floor(height * 0.6) },
+    },
     onScanSuccess,
     () => {} // 忽略扫描失败
   ).then(() => {
     setStatus('准备扫描...');
-    // 隐藏 html5-qrcode 默认UI
-    const dashboard = document.getElementById('reader__dashboard');
-    if (dashboard) dashboard.style.display = 'none';
   }).catch((err) => {
-    setStatus('无法启动摄像头: ' + err);
+    setStatus('摄像头错误: ' + err);
     console.error('Camera error:', err);
+    // 显示开始按钮以便重试
+    const startBtn = document.getElementById('start-btn');
+    startBtn.textContent = '重试';
+    startBtn.style.display = '';
+    document.getElementById('scan-line').style.display = 'none';
   });
 }
 
