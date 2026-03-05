@@ -1,13 +1,13 @@
-const CACHE_NAME = 'scan-toy-v2';
+const CACHE_NAME = 'scan-toy-v3';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
+  './html5-qrcode.min.js',
   './manifest.json',
   './icons/icon-192.svg',
   './icons/icon-512.svg',
-  'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
 ];
 
 // 安装：缓存核心资源
