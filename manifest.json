@@ -2,9 +2,10 @@
   "name": "超市扫码器",
   "short_name": "扫码器",
   "description": "仿真超市扫码器 - 儿童玩具",
-  "start_url": ".",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "orientation": "landscape",
+  "orientation": "any",
   "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",
   "icons": [
